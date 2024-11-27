@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "cache dependencies and build outputs to improve workflow execution time on self hosted machine",
-  "main": "lib/restore/index.js",
+  "main": "lib/save/index.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
