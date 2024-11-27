@@ -13,18 +13,18 @@ async function run(): Promise<void> {
     /* 
       clean up caches
     */
-      const cacheBase = core.getState('cache-base')
-      const cleanKey = core.getInput('clean-key')
-      const CLEAN_TIME = 7
-  
-      if (cleanKey) {
-        await exec(
-          `/bin/bash -c "find ${cacheBase} -maxdepth 1 -name '${cleanKey}*' -type d -atime +${CLEAN_TIME} -exec rm -rf {} +"`
-        )
-      }
-    } catch (error) {
-      if (error instanceof Error) core.warning(error.message)
+    const cacheBase = core.getState('cache-base')
+    const cleanKey = core.getInput('clean-key')
+    const CLEAN_TIME = 7
+
+    if (cleanKey) {
+      await exec(
+        `/bin/bash -c "find ${cacheBase} -maxdepth 1 -name '${cleanKey}*' -type d -atime +${CLEAN_TIME} -exec rm -rf {} +"`
+      )
     }
+  } catch (error) {
+    if (error instanceof Error) core.warning(error.message)
+  }
 
   try {
     const key = core.getInput('key')
@@ -50,13 +50,15 @@ async function run(): Promise<void> {
     core.setOutput('cache-hit', String(cacheHit))
 
     if (cacheHit === true) {
-      const ln = await exec(
-        `ln -s ${p.join(cachePath, path.split('/').slice(-1)[0])} ./${path}`
+      const pathBase = path.split('/').slice(0, -1).join('/')
+
+      const mv = await exec(
+        `mv ${p.join(cachePath, path.split('/').slice(-1)[0])} ./${pathBase}`
       )
 
-      core.debug(ln.stdout)
-      if (ln.stderr) core.error(ln.stderr)
-      if (!ln.stderr) core.info(`Cache restored with key ${key}`)
+      core.debug(mv.stdout)
+      if (mv.stderr) core.error(mv.stderr)
+      if (!mv.stderr) core.info(`Cache restored with key ${key}`)
     } else {
       core.info(`Cache not found for ${key}`)
     }

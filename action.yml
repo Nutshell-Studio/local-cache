@@ -21,7 +21,7 @@ runs:
   using: 'node20'
   main: 'dist/restore/index.js'
   post: 'dist/save/index.js'
-  post-if: success()
+  post-if: steps.cache.outputs.cache-hit == 'true' || (success() && steps.cache.outputs.cache-hit == 'false')
 branding:
   icon: 'archive'
   color: 'gray-dark'
